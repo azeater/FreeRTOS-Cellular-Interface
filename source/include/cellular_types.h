@@ -2,6 +2,8 @@
  * FreeRTOS-Cellular-Interface v1.3.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
+ * SPDX-License-Identifier: MIT
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
  * the Software without restriction, including without limitation the rights to
@@ -311,8 +313,9 @@ typedef enum CellularIPAddressType
  */
 typedef enum CellularSocketOptionLevel
 {
-    CELLULAR_SOCKET_OPTION_LEVEL_IP,       /**< IP layer options. */
-    CELLULAR_SOCKET_OPTION_LEVEL_TRANSPORT /**< Transport (TCP/UDP) layer options. */
+    CELLULAR_SOCKET_OPTION_LEVEL_IP,        /**< IP layer options. */
+    CELLULAR_SOCKET_OPTION_LEVEL_TRANSPORT, /**< Transport (TCP/UDP) layer options. */
+    CELLULAR_SOCKET_OPTION_LEVEL_SECURE     /**< Secure sockets layer options. */
 } CellularSocketOptionLevel_t;
 
 /**
@@ -325,6 +328,8 @@ typedef enum CellularSocketOption
     CELLULAR_SOCKET_OPTION_SEND_TIMEOUT,       /**< Set send timeout (in milliseconds). */
     CELLULAR_SOCKET_OPTION_RECV_TIMEOUT,       /**< Set receive timeout (in milliseconds). */
     CELLULAR_SOCKET_OPTION_PDN_CONTEXT_ID,     /**< Set PDN Context ID to use for the socket. */
+    CELLULAR_SOCKET_OPTION_SSL_CONTEXT_ID,     /**< Set secure sockets layer context ID to use for the socket. */
+    CELLULAR_SOCKET_OPTION_SSL_USAGE,          /**< Set secure sockets layer usage for the socket. */
     CELLULAR_SOCKET_OPTION_SET_LOCAL_PORT      /**< Set local port. */
 } CellularSocketOption_t;
 
@@ -356,13 +361,15 @@ typedef enum CellularPktStatus
  */
 typedef enum CellularATCommandType
 {
-    CELLULAR_AT_NO_RESULT,            /**<  no response expected, only OK, ERROR etc. */
-    CELLULAR_AT_WO_PREFIX,            /**<  string response without a prefix. */
-    CELLULAR_AT_WITH_PREFIX,          /**<  string response with a prefix. */
-    CELLULAR_AT_MULTI_WITH_PREFIX,    /**<  multiple line response all start with a prefix. */
-    CELLULAR_AT_MULTI_WO_PREFIX,      /**<  multiple line response with or without a prefix. */
-    CELLULAR_AT_MULTI_DATA_WO_PREFIX, /**<  multiple line data response with or without a prefix. */
-    CELLULAR_AT_NO_COMMAND            /**<  no command is waiting response. */
+    CELLULAR_AT_NO_RESULT,                  /**<  no response expected, only OK, ERROR etc. */
+    CELLULAR_AT_WO_PREFIX,                  /**<  string response without a prefix. */
+    CELLULAR_AT_WITH_PREFIX,                /**<  string response with a prefix. */
+    CELLULAR_AT_MULTI_WITH_PREFIX,          /**<  multiple line response all start with a prefix. */
+    CELLULAR_AT_MULTI_WO_PREFIX,            /**<  multiple line response with or without a prefix. */
+    CELLULAR_AT_MULTI_DATA_WO_PREFIX,       /**<  multiple line data response with or without a prefix. */
+    CELLULAR_AT_WO_PREFIX_NO_RESULT_CODE,   /**<  string response without a prefix and no result code is expected. */
+    CELLULAR_AT_WITH_PREFIX_NO_RESULT_CODE, /**<  string response WITH a prefix and no result code is expected. */
+    CELLULAR_AT_NO_COMMAND                  /**<  no command is waiting response. */
 } CellularATCommandType_t;
 
 /**
@@ -467,7 +474,7 @@ typedef struct CellularServiceStatus
  */
 typedef struct CellularATCommandLine
 {
-    struct CellularATCommandLine * pNext; /**< The CellularATCommandLine structure pointer points to the next element of the liniked list. */
+    struct CellularATCommandLine * pNext; /**< The CellularATCommandLine structure pointer points to the next element of the linked list. */
     char * pLine;                         /**< The content of the at command. */
 } CellularATCommandLine_t;
 
@@ -604,8 +611,8 @@ typedef struct CellularEidrxSettings
      * 1 1 1 0   5242.88 seconds
      * 1 1 1 1   10485.76 seconds
      */
-    uint8_t requestedEdrxVaue;  /**< Requested eDRX value encoded as per spec (as shown above). */
-    uint8_t nwProvidedEdrxVaue; /**< Network provided eDRX value encoded as per spec (as shown above). Only applicable in URC. */
+    uint8_t requestedEdrxValue;  /**< Requested eDRX value encoded as per spec (as shown above). */
+    uint8_t nwProvidedEdrxValue; /**< Network provided eDRX value encoded as per spec (as shown above). Only applicable in URC. */
 
     /*
      * LTE Cat M1 mode
@@ -714,7 +721,7 @@ typedef struct CellularSocketAddress
  * @param[in] cellularHandle The opaque cellular context pointer created by Cellular_Init.
  * @param[in] pAtResp The response received for the AT command.
  * @param[in] pData is pATCommandPayload pointer in Cellular_ATCommandRaw parameters.
- * @param[in] dataLen is the string length of pATCommandPayloadin in Cellular_ATCommandRaw parameters.
+ * @param[in] dataLen is the string length of pATCommandPayload in in Cellular_ATCommandRaw parameters.
  *
  * @return CELLULAR_PKT_STATUS_OK if the operation is successful, otherwise an error
  * code indicating the cause of the error.

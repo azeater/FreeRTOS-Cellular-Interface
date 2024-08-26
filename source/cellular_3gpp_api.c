@@ -1271,7 +1271,7 @@ static CellularATError_t parseEidrxToken( char * pToken,
                 if( ( tempValue >= 0 ) &&
                     ( tempValue <= ( int32_t ) UINT8_MAX ) )
                 {
-                    pEidrxSettingsList->eidrxList[ count ].requestedEdrxVaue = ( uint8_t ) tempValue;
+                    pEidrxSettingsList->eidrxList[ count ].requestedEdrxValue = ( uint8_t ) tempValue;
                 }
                 else
                 {
@@ -1338,7 +1338,7 @@ static CellularATError_t parseEidrxLine( char * pInputLine,
     {
         LogDebug( ( "GetEidrx setting[%d]: RAT: %d, Value: 0x%x",
                     count, pEidrxSettingsList->eidrxList[ count ].rat,
-                    pEidrxSettingsList->eidrxList[ count ].requestedEdrxVaue ) );
+                    pEidrxSettingsList->eidrxList[ count ].requestedEdrxValue ) );
     }
     else
     {
@@ -1701,7 +1701,7 @@ CellularError_t Cellular_CommonSetEidrxSettings( CellularHandle_t cellularHandle
                            "AT+CEDRXS=",
                            pEidrxSettings->mode,
                            pEidrxSettings->rat,
-                           PRINTF_BYTE_TO_BINARY_INT4( pEidrxSettings->requestedEdrxVaue ) );
+                           PRINTF_BYTE_TO_BINARY_INT4( pEidrxSettings->requestedEdrxValue ) );
         LogDebug( ( "Eidrx setting: %s ", cmdBuf ) );
         /* Query the PSMsettings from the network. */
         pktStatus = _Cellular_AtcmdRequestWithCallback( pContext, atReqSetEidrx );

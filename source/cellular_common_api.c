@@ -2,6 +2,8 @@
  * FreeRTOS-Cellular-Interface v1.3.0
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
+ * SPDX-License-Identifier: MIT
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
  * the Software without restriction, including without limitation the rights to
@@ -105,8 +107,8 @@ static CellularError_t _socketSetSockOptLevelTransport( CellularSocketOption_t o
         }
         else
         {
-            LogError( ( "Cellular_SocketSetSockOpt: Cannot change the contextID in this state %d or length %d is invalid.",
-                        socketHandle->socketState, optionValueLength ) );
+            LogError( ( "Cellular_SocketSetSockOpt: Cannot change the contextID in this state %d or length %u is invalid.",
+                        socketHandle->socketState, ( unsigned int ) optionValueLength ) );
             cellularStatus = CELLULAR_INTERNAL_FAILURE;
         }
     }
@@ -121,8 +123,8 @@ static CellularError_t _socketSetSockOptLevelTransport( CellularSocketOption_t o
         }
         else
         {
-            LogError( ( "Cellular_SocketSetSockOpt: Cannot change the localPort in this state %d or length %d is invalid.",
-                        socketHandle->socketState, optionValueLength ) );
+            LogError( ( "Cellular_SocketSetSockOpt: Cannot change the localPort in this state %d or length %u is invalid.",
+                        socketHandle->socketState, ( unsigned int ) optionValueLength ) );
             cellularStatus = CELLULAR_INTERNAL_FAILURE;
         }
     }
@@ -151,7 +153,7 @@ CellularError_t Cellular_CommonInit( CellularHandle_t * pCellularHandle,
     if( cellularStatus == CELLULAR_SUCCESS )
     {
         pContext = *pCellularHandle;
-        cellularStatus = Cellular_ModuleInit( pContext, &pContext->pModueContext );
+        cellularStatus = Cellular_ModuleInit( pContext, &pContext->pModuleContext );
     }
 
     /* Setup UE, URC and query register status. */
@@ -436,14 +438,15 @@ CellularError_t Cellular_CommonSocketSetSockOpt( CellularHandle_t cellularHandle
     }
     else
     {
-        if( optionLevel == CELLULAR_SOCKET_OPTION_LEVEL_IP )
-        {
-            LogError( ( "Cellular_SocketSetSockOpt: Option not supported" ) );
-            cellularStatus = CELLULAR_UNSUPPORTED;
-        }
-        else /* optionLevel CELLULAR_SOCKET_OPTION_LEVEL_TRANSPORT. */
+        if( optionLevel == CELLULAR_SOCKET_OPTION_LEVEL_TRANSPORT )
         {
             cellularStatus = _socketSetSockOptLevelTransport( option, socketHandle, pOptionValue, optionValueLength );
+        }
+        else
+        {
+            /* Other socket option levels are not supported in common layer. Modem ports
+             * can use their own implementation for these options. */
+            cellularStatus = CELLULAR_UNSUPPORTED;
         }
     }
 
