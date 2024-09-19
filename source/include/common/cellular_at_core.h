@@ -48,7 +48,7 @@
 /**
  * @brief Maximum size of an AT string.
  */
-#define CELLULAR_AT_MAX_STRING_SIZE    ( 256U )
+#define CELLULAR_AT_MAX_STRING_SIZE    ( 1600U )
 
 /**
  * @brief Maximum size of an AT prefix.
